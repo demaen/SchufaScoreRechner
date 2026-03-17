@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0d1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Schufa Score">
+<title>Schufa Score Rechner</title>
+<link id="pwa-manifest" rel="manifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:     #0d1220;
+  --bg2:    #111928;
+  --bg3:    #1a2538;
+  --gold:   #c8993a;
+  --gold-l: #e0b96a;
+  --gold-d: #8a6a22;
+  --text:   #f0ece4;
+  --muted:  #7d8799;
+  --border: rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.13);
+  --green:  #4ade80;
+  --lime:   #a3e635;
+  --yellow: #fbbf24;
+  --orange: #fb923c;
+  --red:    #f87171;
+  --radius: 14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{height:100%;font-size:16px}
+body{
+  min-height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:'IBM Plex Sans',sans-serif;
+  overflow-x:hidden;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 60% 40% at 15% 10%,rgba(200,153,58,.07) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 50% at 85% 90%,rgba(74,222,128,.04) 0%,transparent 70%);
+  pointer-events:none;z-index:0;
+}
+#app{
+  position:relative;z-index:1;
+  max-width:500px;margin:0 auto;
+  padding:0 18px;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+}
+
+/* ── HEADER ── */
+.hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 0 8px;
+}
+.hdr-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:22px;font-weight:700;letter-spacing:.02em;
+}
+.hdr-badge{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;color:var(--gold);letter-spacing:.08em;
+  background:rgba(200,153,58,.1);border:1px solid rgba(200,153,58,.2);
+  padding:4px 10px;border-radius:20px;
+}
+
+/* ── PROGRESS ── */
+.progress-wrap{padding:6px 0 4px}
+.progress-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.progress-counter{
+  font-family:'IBM Plex Mono',monospace;font-size:11px;
+  color:var(--muted);white-space:nowrap;
+}
+.progress-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-fill{
+  height:100%;border-radius:2px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-l));
+  transition:width .4s ease;
+}
+.dots{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;padding:2px 0 10px}
+.dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--border);border:1px solid var(--border2);
+  transition:all .25s;flex-shrink:0;
+}
+.dot.done{background:var(--gold);border-color:var(--gold)}
+.dot.active{background:transparent;border-color:var(--gold);box-shadow:0 0 7px var(--gold);transform:scale(1.35)}
+
+/* ── CARDS ── */
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:24px 20px;
+  margin-bottom:12px;
+  animation:rise .3s ease;
+}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── QUESTION ── */
+.q-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.q-icon{
+  width:44px;height:44px;flex-shrink:0;
+  background:rgba(200,153,58,.1);border:1px solid rgba(200,153,58,.18);
+  border-radius:11px;display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+}
+.q-meta{flex:1}
+.q-tag{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);font-weight:500;margin-bottom:3px}
+.q-title{font-family:'Cormorant Garamond',serif;font-size:23px;font-weight:600;line-height:1.2}
+.q-max{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-top:3px}
+.q-desc{
+  font-size:13px;color:var(--muted);line-height:1.65;
+  padding:11px 14px;margin-bottom:16px;
+  border-left:2px solid var(--gold);
+  background:rgba(255,255,255,.02);border-radius:0 8px 8px 0;
+}
+
+/* ── OPTIONS ── */
+.options{display:flex;flex-direction:column;gap:7px}
+.opt{
+  display:flex;align-items:center;gap:13px;
+  padding:12px 14px;
+  background:transparent;
+  border:1px solid var(--border);border-radius:10px;
+  cursor:pointer;width:100%;color:var(--text);
+  text-align:left;transition:all .18s;font-family:'IBM Plex Sans',sans-serif;
+}
+.opt:hover{border-color:var(--border2);background:rgba(255,255,255,.02)}
+.opt.sel{border-color:var(--gold);background:rgba(200,153,58,.07)}
+.opt.sel .radio{background:var(--gold);border-color:var(--gold)}
+.opt.bad.sel{border-color:var(--red);background:rgba(248,113,113,.07)}
+.opt.bad.sel .radio{background:var(--red);border-color:var(--red)}
+.radio{
+  width:18px;height:18px;flex-shrink:0;
+  border-radius:50%;border:2px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;
+}
+.radio-dot{width:6px;height:6px;border-radius:50%;background:var(--bg2);opacity:0;transition:opacity .18s}
+.opt.sel .radio-dot{opacity:1}
+.opt-body{flex:1}
+.opt-label{font-size:14px;font-weight:500;line-height:1.3}
+.opt-hint{font-size:12px;color:var(--muted);margin-top:2px;line-height:1.4}
+.opt-pts{
+  font-family:'IBM Plex Mono',monospace;font-size:13px;
+  font-weight:600;color:var(--gold-l);white-space:nowrap;
+}
+.opt-pts.bad-pts{color:var(--red);font-size:11px}
+
+/* ── SCORE PREVIEW ── */
+.preview{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 18px;
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;margin-bottom:12px;
+  transition:opacity .3s;
+}
+.preview-val{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:26px;font-weight:600;
+  transition:color .3s;white-space:nowrap;
+}
+.preview-meta{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
+.preview-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.bar-wrap{flex:1;height:5px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .4s ease,background-color .4s}
+.preview-of{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);white-space:nowrap}
+
+/* ── NAVIGATION ── */
+.nav{display:flex;gap:10px;padding:4px 0 20px}
+.btn{
+  border:none;border-radius:10px;
+  font-size:15px;font-weight:500;font-family:'IBM Plex Sans',sans-serif;
+  cursor:pointer;padding:14px 20px;transition:all .18s;
+}
+.btn-back{
+  background:transparent;color:var(--muted);
+  border:1px solid var(--border);flex:0 0 auto;
+}
+.btn-back:hover{border-color:var(--border2);color:var(--text)}
+.btn-next{background:var(--gold);color:#0d1220;font-weight:600;flex:1}
+.btn-next:hover{background:var(--gold-l)}
+.btn-next:disabled{opacity:.28;cursor:not-allowed}
+
+/* ── INTRO ── */
+.intro{flex:1;display:flex;flex-direction:column;justify-content:center;padding:10px 0}
+.intro-hero{text-align:center;margin-bottom:28px}
+.intro-icon{font-size:56px;margin-bottom:18px}
+.intro-h{
+  font-family:'Cormorant Garamond',serif;
+  font-size:32px;font-weight:700;line-height:1.15;margin-bottom:12px;
+}
+.intro-p{font-size:14px;color:var(--muted);line-height:1.7;max-width:360px;margin:0 auto 24px}
+.intro-chips{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+.chip{
+  font-size:12px;background:rgba(255,255,255,.04);
+  border:1px solid var(--border);border-radius:20px;
+  padding:6px 12px;display:flex;align-items:center;gap:6px;
+}
+.intro-note{font-size:12px;color:var(--muted);text-align:center;margin-bottom:28px}
+
+/* ── RESULTS ── */
+.results{animation:rise .4s ease}
+.res-hero{text-align:center;padding:28px 0 20px}
+.gauge{margin:0 auto 16px;width:180px;height:180px;position:relative;display:flex}
+.gauge svg{transform:rotate(-90deg)}
+.gauge-bg{fill:none;stroke:rgba(255,255,255,.06);stroke-width:9}
+.gauge-fill{fill:none;stroke-width:9;stroke-linecap:round;transition:stroke-dashoffset 1.6s cubic-bezier(.23,1,.32,1)}
+.gauge-center{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.score-num{
+  font-family:'Cormorant Garamond',serif;
+  font-size:58px;font-weight:700;line-height:1;
+}
+.score-denom{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:2px}
+.res-rating{font-size:14px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:10px}
+.res-pct{font-size:13px;color:var(--muted);margin-top:4px}
+
+.summary{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;
+}
+.stat{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:14px 12px;text-align:center;
+}
+.stat-val{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.06em}
+
+.sec-title{
+  font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;
+  padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:16px;
+}
+.breakdown{margin-bottom:24px}
+.bdi{margin-bottom:14px}
+.bdi-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+.bdi-name{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500}
+.bdi-ico{font-size:15px}
+.bdi-score{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600}
+.bdi-bar{height:4px;background:rgba(255,255,255,.05);border-radius:2px;overflow:hidden;margin-bottom:4px}
+.bdi-fill{height:100%;border-radius:2px;transition:width .7s ease .1s}
+.bdi-choice{font-size:11px;color:var(--muted)}
+
+.tips{margin-bottom:24px}
+.tip{
+  display:flex;gap:12px;padding:13px 16px;
+  background:rgba(255,255,255,.02);border:1px solid var(--border);
+  border-radius:10px;margin-bottom:8px;
+}
+.tip-ico{font-size:18px;flex-shrink:0;margin-top:1px}
+.tip-body{font-size:13px;color:var(--muted);line-height:1.55}
+.tip-title{color:var(--text);font-weight:500;font-size:14px;display:block;margin-bottom:2px}
+
+/* ── DISQUALIFIED ── */
+.disq{
+  background:rgba(248,113,113,.07);border:1px solid rgba(248,113,113,.22);
+  border-radius:var(--radius);padding:28px 22px;text-align:center;
+  margin:12px 0;
+}
+.disq-ico{font-size:44px;margin-bottom:14px}
+.disq-h{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--red);margin-bottom:10px;font-weight:700}
+.disq-p{font-size:14px;color:var(--muted);line-height:1.65}
+
+/* ── BTN RESTART ── */
+.btn-restart{
+  width:100%;padding:15px;
+  background:transparent;border:1px solid var(--border);
+  color:var(--muted);border-radius:10px;font-size:15px;
+  font-family:'IBM Plex Sans',sans-serif;cursor:pointer;
+  transition:all .2s;margin-bottom:36px;
+}
+.btn-restart:hover{border-color:var(--gold);color:var(--gold)}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ═══════════════════════ DATA ═══════════════════════ */
+const MAX = 999;
+
+const CRITERIA = [
+  {
+    id:1, icon:'⚠️', title:'Zahlungsstörungen', max:264,
+    desc:'Haben Sie aktuell oder in den letzten 3 Jahren Zahlungsstörungen, Inkasso oder ähnliche negative Einträge?',
+    opts:[
+      {l:'Keine',             h:'Keine Zahlungsstörungen in den letzten 3 Jahren', p:264},
+      {l:'Erledigt (< 1 Jahr)',h:'Zahlungsstörung beglichen, vor weniger als einem Jahr', p:100},
+      {l:'Erledigt (1–2 Jahre)',h:'Zahlungsstörung beglichen, vor 1 bis 2 Jahren', p:135},
+      {l:'Erledigt (≥ 2 Jahre)',h:'Zahlungsstörung beglichen, vor mehr als 2 Jahren', p:152},
+      {l:'Offen / Aktuell',   h:'Es besteht eine nicht erledigte Zahlungsstörung', p:null, bad:true},
+    ]
+  },
+  {
+    id:2, icon:'🏦', title:'Ältester Bankvertrag', max:69,
+    desc:'Wie alt ist Ihr ältestes Bankkonto oder Bankvertrag (Girokonto, Sparkonto, etc.)?',
+    opts:[
+      {l:'Kein Bankvertrag',p:18},{l:'< 3 Monate',p:0},{l:'3–6 Monate',p:3},
+      {l:'6–12 Monate',p:6},{l:'1–2 Jahre',p:12},{l:'2–3 Jahre',p:17},
+      {l:'3–4 Jahre',p:23},{l:'4–5 Jahre',p:27},{l:'5–10 Jahre',p:37},
+      {l:'10–15 Jahre',p:49},{l:'15–20 Jahre',p:56},{l:'≥ 20 Jahre',p:69},
+    ]
+  },
+  {
+    id:3, icon:'💳', title:'Älteste Kreditkarte', max:81,
+    desc:'Wie alt ist Ihre älteste Kreditkarte (z. B. Visa, Mastercard, American Express)?',
+    opts:[
+      {l:'Keine Kreditkarte',p:24},{l:'< 6 Monate',p:0},{l:'6–12 Monate',p:14},
+      {l:'1–2 Jahre',p:23},{l:'2–3 Jahre',p:32},{l:'3–4 Jahre',p:41},
+      {l:'4–5 Jahre',p:52},{l:'5–10 Jahre',p:59},{l:'10–15 Jahre',p:74},
+      {l:'≥ 15 Jahre',p:81},
+    ]
+  },
+  {
+    id:4, icon:'🏠', title:'Aktuelle Wohnadresse', max:94,
+    desc:'Wie lange wohnen Sie bereits an Ihrer aktuellen Adresse?',
+    opts:[
+      {l:'< 7 Monate',p:0},{l:'7–12 Monate',p:6},{l:'1–2 Jahre',p:17},
+      {l:'2–3 Jahre',p:28},{l:'3–4 Jahre',p:35},{l:'4–5 Jahre',p:40},
+      {l:'5–6 Jahre',p:42},{l:'6–8 Jahre',p:49},{l:'8–9 Jahre',p:54},
+      {l:'9–10 Jahre',p:58},{l:'10–15 Jahre',p:63},{l:'15–20 Jahre',p:75},
+      {l:'≥ 20 Jahre',p:94},
+    ]
+  },
+  {
+    id:5, icon:'💰', title:'Jüngster Rahmenkredit', max:36,
+    desc:'Ein Rahmenkredit ist ein revolvierender Kredit bis zu einem vereinbarten Limit – günstiger als Dispo. Wie alt ist Ihr jüngster?',
+    opts:[
+      {l:'Kein Rahmenkredit',p:36},{l:'< 1 Jahr',p:0},
+      {l:'1–2 Jahre',p:16},{l:'≥ 2 Jahre',p:36},
+    ]
+  },
+  {
+    id:6, icon:'🔍', title:'Bankanfragen (letzte 12 Monate)', max:117,
+    desc:'Wie viele Konditionsanfragen oder Abschlüsse für Girokonten / Kreditkarten gab es in den letzten 12 Monaten? Mehrere Anfragen innerhalb von 28 Tagen zählen als eine.',
+    opts:[
+      {l:'0 Anfragen',p:117},{l:'1 Anfrage',p:82},
+      {l:'2 Anfragen',p:44},{l:'≥ 3 Anfragen',p:0},
+    ]
+  },
+  {
+    id:7, icon:'📋', title:'Anfragen außerhalb Banken (letzte 12 Monate)', max:99,
+    desc:'Wie viele Bonitätsanfragen von Nicht-Banken gab es (z. B. Vermieter, Mobilfunk, Onlinehandel) in den letzten 12 Monaten?',
+    opts:[
+      {l:'0–1 Anfragen',p:99},{l:'2 Anfragen',p:71},
+      {l:'3 Anfragen',p:40},{l:'≥ 4 Anfragen',p:0},
+    ]
+  },
+  {
+    id:8, icon:'📊', title:'Neue Ratenkredite (letzte 12 Monate)', max:66,
+    desc:'Wie viele neue Ratenkredite (Auto, Konsument, etc.) haben Sie in den letzten 12 Monaten aufgenommen?',
+    opts:[
+      {l:'0 neue Kredite',p:66},{l:'1 neuer Kredit',p:48},
+      {l:'2 neue Kredite',p:32},{l:'≥ 3 neue Kredite',p:0},
+    ]
+  },
+  {
+    id:9, icon:'⏱️', title:'Längste Restlaufzeit Ratenkredite', max:61,
+    desc:'Wie lange läuft Ihr aktuell längster bestehender Ratenkredit noch?',
+    opts:[
+      {l:'Kein Kredit / ≤ 3 Jahre Restlaufzeit',p:61},
+      {l:'3–4 Jahre Restlaufzeit',p:48},{l:'4–5 Jahre Restlaufzeit',p:28},
+      {l:'5–6 Jahre Restlaufzeit',p:10},{l:'≥ 6 Jahre Restlaufzeit',p:0},
+    ]
+  },
+  {
+    id:10, icon:'✅', title:'Kreditstatus', max:19,
+    desc:'Was ist der aktuelle Status Ihrer Ratenkredite (Autokredite, Konsumkredite etc.)?',
+    opts:[
+      {l:'Kein Ratenkredit vorhanden',h:'Sie haben nie einen Ratenkredit aufgenommen',p:9},
+      {l:'Positiv erledigt',h:'Mindestens ein Kredit wurde vollständig abbezahlt',p:19},
+      {l:'Offen oder negativ',h:'Es laufen Kredite oder es gab negative Einträge',p:0},
+    ]
+  },
+  {
+    id:11, icon:'🏡', title:'Immobilienkredit / Bürgschaft', max:55,
+    desc:'Besitzen Sie eine Immobilie und zahlen dafür einen Hypothekenkredit ab? Oder bestehen Bürgschaften?',
+    opts:[
+      {l:'Nicht vorhanden',h:'Kein Immobilienkredit und keine Bürgschaft',p:0},
+      {l:'Vorhanden',h:'Sie zahlen aktiv einen Immobilienkredit oder eine Bürgschaft ab',p:55},
+    ]
+  },
+  {
+    id:12, icon:'🪪', title:'Identitätsprüfung', max:38,
+    desc:'Wurde Ihre Identität bei der Schufa bereits überprüft (z. B. über die eID Ihres Personalausweises)?',
+    opts:[
+      {l:'Nicht überprüft',h:'Keine Identitätsverifikation bei der Schufa',p:0},
+      {l:'Identität überprüft',h:'Ihre Identität wurde über eID oder Post-Ident verifiziert',p:38},
+    ]
+  },
+];
+
+/* ═══════════════════════ STATE ═══════════════════════ */
+let S = {step:0, ans:{}};
+
+/* ═══════════════════════ SCORING ═══════════════════════ */
+function calcScore(){
+  let total=0, disq=false;
+  for(const c of CRITERIA){
+    const i=S.ans[c.id];
+    if(i===undefined) continue;
+    const o=c.opts[i];
+    if(o.bad){disq=true;break;}
+    total+=o.p;
+  }
+  return {total, disq};
+}
+function scoreColor(t){
+  if(t===null||t===undefined) return 'var(--red)';
+  const r=t/MAX;
+  if(r>=.9) return 'var(--green)';
+  if(r>=.75) return '#86efac';
+  if(r>=.6) return 'var(--yellow)';
+  if(r>=.4) return 'var(--orange)';
+  return 'var(--red)';
+}
+function scoreRating(t){
+  if(t===null) return '—';
+  const r=t/MAX;
+  if(r>=.9) return 'Ausgezeichnet';
+  if(r>=.75) return 'Sehr gut';
+  if(r>=.6) return 'Gut';
+  if(r>=.4) return 'Befriedigend';
+  if(r>=.2) return 'Ausreichend';
+  return 'Unzureichend';
+}
+function barColor(pct){
+  if(pct>=75) return 'var(--green)';
+  if(pct>=50) return '#86efac';
+  if(pct>=25) return 'var(--yellow)';
+  if(pct>0)   return 'var(--orange)';
+  return 'rgba(255,255,255,.12)';
+}
+
+/* ═══════════════════════ RENDER ═══════════════════════ */
+function render(){
+  const app=document.getElementById('app');
+  app.innerHTML = S.step===0 ? renderIntro()
+                : S.step<=CRITERIA.length ? renderQuestion()
+                : renderResults();
+  if(S.step>CRITERIA.length) animateResults();
+}
+
+/* ── INTRO ── */
+function renderIntro(){
+  return`<div class="intro">
+  <div class="intro-hero">
+    <div class="intro-icon">🏛️</div>
+    <h1 class="intro-h">Schufa Score<br>Rechner</h1>
+    <p class="intro-p">
+      Das neue Schufa-Scoring bewertet Ihre Bonität anhand von
+      <strong>12 Kriterien</strong> mit bis zu <strong>999 Punkten</strong>.
+      Ermitteln Sie in 2 Minuten Ihren persönlichen Score.
+    </p>
+    <div class="intro-chips">
+      <span class="chip">⚠️ Zahlungsverhalten</span>
+      <span class="chip">🏦 Bankhistorie</span>
+      <span class="chip">💳 Kreditnutzung</span>
+      <span class="chip">🏠 Wohnstabilität</span>
+    </div>
+    <p class="intro-note">⏱ Ca. 2–3 Minuten &nbsp;·&nbsp; Keine Daten werden gespeichert oder übertragen</p>
+  </div>
+  <button class="btn btn-next" style="width:100%;font-size:16px;padding:16px" onclick="go(1)">
+    Berechnung starten →
+  </button>
+</div>`;
+}
+
+/* ── QUESTION ── */
+function renderQuestion(){
+  const c=CRITERIA[S.step-1];
+  const cur=S.ans[c.id];
+  const {total,disq}=calcScore();
+  const pct=total>0?(total/MAX*100):0;
+  const col=scoreColor(disq?null:total);
+  const answered=Object.keys(S.ans).length;
+
+  const opts=c.opts.map((o,i)=>{
+    const sel=cur===i;
+    const pts=o.bad?`<span class="opt-pts bad-pts">⛔ Gesperrt</span>`
+              :`<span class="opt-pts">+${o.p}</span>`;
+    return`<button class="opt${sel?' sel':''}${o.bad?' bad':''}" onclick="pick(${c.id},${i})">
+      <span class="radio"><span class="radio-dot"></span></span>
+      <span class="opt-body">
+        <span class="opt-label">${o.l}</span>
+        ${o.h?`<span class="opt-hint">${o.h}</span>`:''}
+      </span>
+      ${pts}
+    </button>`;
+  }).join('');
+
+  const preview=answered>0?`
+  <div class="preview">
+    <div class="preview-meta">
+      <span class="preview-label">Score bisher</span>
+      <span class="preview-val" style="color:${col}">${disq?'—':total}</span>
+    </div>
+    <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%;background:${col}"></div></div>
+    <span class="preview-of">/ ${MAX}</span>
+  </div>`:'';
+
+  return`
+  <div class="hdr">
+    <span class="hdr-title">Schufa Score</span>
+    <span class="hdr-badge">Kriterium ${S.step}/${CRITERIA.length}</span>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-row">
+      <span class="progress-counter">${S.step} / ${CRITERIA.length}</span>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width:${((S.step-1)/CRITERIA.length*100)}%"></div>
+      </div>
+    </div>
+    <div class="dots">
+      ${CRITERIA.map((_,i)=>`<span class="dot${i<S.step-1?' done':i===S.step-1?' active':''}"></span>`).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <div class="q-head">
+      <div class="q-icon">${c.icon}</div>
+      <div class="q-meta">
+        <div class="q-tag">Score-Kriterium ${c.id}</div>
+        <div class="q-title">${c.title}</div>
+        <div class="q-max">Max. ${c.max} Punkte</div>
+      </div>
+    </div>
+    <div class="q-desc">${c.desc}</div>
+    <div class="options">${opts}</div>
+  </div>
+  ${preview}
+  <div class="nav">
+    <button class="btn btn-back" onclick="goBack()">← Zurück</button>
+    <button class="btn btn-next" ${cur===undefined?'disabled':''} onclick="goNext()">
+      ${S.step===CRITERIA.length?'Ergebnis anzeigen ✓':'Weiter →'}
+    </button>
+  </div>`;
+}
+
+/* ── RESULTS ── */
+function renderResults(){
+  const {total,disq}=calcScore();
+  const col=scoreColor(disq?null:total);
+  const pct=disq?0:Math.round(total/MAX*100);
+  const C=2*Math.PI*70;
+
+  const breakdown=CRITERIA.map(c=>{
+    const i=S.ans[c.id];
+    if(i===undefined) return '';
+    const o=c.opts[i];
+    const pts=o.bad?0:o.p;
+    const p=Math.round(pts/c.max*100);
+    const bc=o.bad?'var(--red)':barColor(p);
+    return`<div class="bdi">
+      <div class="bdi-head">
+        <span class="bdi-name"><span class="bdi-ico">${c.icon}</span>${c.title}</span>
+        <span class="bdi-score" style="color:${bc}">${o.bad?'⛔':pts} / ${c.max}</span>
+      </div>
+      <div class="bdi-bar"><div class="bdi-fill" style="width:${p}%;background:${bc}"></div></div>
+      <div class="bdi-choice">Angabe: ${o.l}</div>
+    </div>`;
+  }).join('');
+
+  const tips=buildTips();
+
+  if(disq) return`
+  <div class="results">
+    <div class="hdr">
+      <span class="hdr-title">Schufa Score</span>
+      <span class="hdr-badge">Ergebnis</span>
+    </div>
+    <div class="disq">
+      <div class="disq-ico">🚫</div>
+      <div class="disq-h">Score nicht berechenbar</div>
+      <p class="disq-p">
+        Sie haben eine <strong style="color:var(--text)">offene Zahlungsstörung</strong> angegeben.
+        Solange dieser Eintrag besteht, kann die Schufa keinen Score berechnen.
+        Nach vollständiger Begleichung und Ablauf der gesetzlichen Frist (max. 3 Jahre) wird
+        der Eintrag gelöscht – ab dann ist wieder eine Berechnung möglich.
+      </p>
+    </div>
+    <div class="breakdown">
+      <div class="sec-title">Kriterien-Auswertung</div>
+      ${breakdown}
+    </div>
+    <button class="btn-restart" onclick="restart()">↺ Angaben ändern / Neu starten</button>
+  </div>`;
+
+  return`
+  <div class="results">
+    <div class="hdr">
+      <span class="hdr-title">Schufa Score</span>
+      <span class="hdr-badge">Ergebnis</span>
+    </div>
+    <div class="res-hero">
+      <div class="gauge">
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          <circle class="gauge-bg" cx="90" cy="90" r="70"/>
+          <circle class="gauge-fill" cx="90" cy="90" r="70"
+            stroke="${col}"
+            stroke-dasharray="${C}"
+            stroke-dashoffset="${C}"
+            id="g-fill"
+          />
+        </svg>
+        <div class="gauge-center">
+          <div class="score-num" style="color:${col}" id="s-num">0</div>
+          <div class="score-denom">von 999</div>
+        </div>
+      </div>
+      <div class="res-rating" style="color:${col}">${scoreRating(total)}</div>
+      <div class="res-pct">${pct}% des Maximalscores</div>
+    </div>
+    <div class="summary">
+      <div class="stat">
+        <div class="stat-val" style="color:${col}">${total}</div>
+        <div class="stat-lbl">Ihr Score</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val">${MAX}</div>
+        <div class="stat-lbl">Maximum</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" style="color:var(--muted)">${MAX-total}</div>
+        <div class="stat-lbl">Potenzial</div>
+      </div>
+    </div>
+    <div class="breakdown">
+      <div class="sec-title">Kriterien-Auswertung</div>
+      ${breakdown}
+    </div>
+    ${tips.length?`
+    <div class="tips">
+      <div class="sec-title">💡 Verbesserungstipps</div>
+      ${tips.map(t=>`
+      <div class="tip">
+        <span class="tip-ico">${t.ico}</span>
+        <div class="tip-body"><span class="tip-title">${t.title}</span>${t.text}</div>
+      </div>`).join('')}
+    </div>`:''}
+    <button class="btn-restart" onclick="restart()">↺ Neu berechnen</button>
+  </div>`;
+}
+
+/* ── ANIMATION ── */
+function animateResults(){
+  const {total,disq}=calcScore();
+  if(disq||total===null) return;
+  const C=2*Math.PI*70;
+  const target=C-(total/MAX)*C;
+  setTimeout(()=>{
+    const el=document.getElementById('g-fill');
+    if(el) el.style.strokeDashoffset=target;
+  },100);
+  const num=document.getElementById('s-num');
+  if(!num) return;
+  const start=performance.now();
+  const dur=1500;
+  (function tick(now){
+    const p=Math.min((now-start)/dur,1);
+    const e=1-Math.pow(1-p,3);
+    num.textContent=Math.round(e*total);
+    if(p<1) requestAnimationFrame(tick);
+  })(start);
+}
+
+/* ── TIPS ── */
+function buildTips(){
+  const tips=[];
+  const ans=(id)=>S.ans[id]!==undefined?CRITERIA[id-1].opts[S.ans[id]]:null;
+
+  if(ans(1)&&S.ans[1]>0&&S.ans[1]<4)
+    tips.push({ico:'📅',title:'Alte Einträge löschen lassen',
+      text:'Begleichen Sie offene Forderungen so früh wie möglich. Nach 3 Jahren werden erledigte Einträge automatisch gelöscht.'});
+
+  if(S.ans[6]!==undefined&&S.ans[6]>0)
+    tips.push({ico:'🔍',title:'Bankanfragen bündeln',
+      text:'Stellen Sie mehrere Anfragen innerhalb von 28 Tagen – sie werden dann als eine einzige Anfrage gewertet.'});
+
+  if(S.ans[8]!==undefined&&S.ans[8]>0)
+    tips.push({ico:'📊',title:'Neue Ratenkredite begrenzen',
+      text:'Nehmen Sie nicht mehr als zwei neue Ratenkredite pro Jahr auf, um den Score zu schützen.'});
+
+  if(S.ans[12]===0)
+    tips.push({ico:'🪪',title:'Identität verifizieren',
+      text:'Registrieren Sie sich bei MeineSchufa.de mit Ihrer eID und erhalten Sie sofort 38 Bonuspunkte.'});
+
+  if(S.ans[2]!==undefined&&S.ans[2]<=2)
+    tips.push({ico:'🏦',title:'Bankverbindung langfristig halten',
+      text:'Je länger Ihr ältestes Konto besteht, desto mehr Punkte. Schließen Sie alte Konten nicht vorschnell.'});
+
+  if(S.ans[4]!==undefined&&S.ans[4]<=3)
+    tips.push({ico:'🏠',title:'Adressstabilität signalisiert Verlässlichkeit',
+      text:'Häufige Umzüge senken den Score. Wenn möglich, bleiben Sie längerfristig an einer Adresse.'});
+
+  return tips.slice(0,4);
+}
+
+/* ═══════════════════════ ACTIONS ═══════════════════════ */
+function pick(id,i){
+  S.ans[id]=i;
+  render();
+}
+function goNext(){
+  const c=CRITERIA[S.step-1];
+  if(S.ans[c.id]===undefined) return;
+  if(S.step<CRITERIA.length) S.step++;
+  else S.step=CRITERIA.length+1;
+  render();
+}
+function goBack(){
+  if(S.step>1) S.step--;
+  else S.step=0;
+  render();
+}
+function go(n){S.step=n;render();}
+function restart(){S={step:0,ans:{}};render();}
+
+/* ═══════════════════════ PWA ═══════════════════════ */
+(function setupPWA(){
+  const m={
+    name:'Schufa Score Rechner',short_name:'Score Rechner',
+    description:'Berechnen Sie Ihren neuen Schufa-Score nach dem aktuellen Modell',
+    start_url:'./',display:'standalone',
+    background_color:'#0d1220',theme_color:'#0d1220',
+    orientation:'portrait-primary',
+    icons:[{
+      src:`data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>
+        <rect width='100' height='100' rx='22' fill='%230d1220'/>
+        <rect x='18' y='28' width='64' height='44' rx='8' fill='none' stroke='%23c8993a' stroke-width='4'/>
+        <text y='62' x='50' font-size='28' text-anchor='middle' fill='%23c8993a' font-family='serif' font-weight='bold'>S</text>
+      </svg>`,sizes:'any',type:'image/svg+xml'
+    }]
+  };
+  try{
+    const u=URL.createObjectURL(new Blob([JSON.stringify(m)],{type:'application/manifest+json'}));
+    document.getElementById('pwa-manifest').href=u;
+  }catch(e){}
+
+  if('serviceWorker' in navigator){
+    const sw=`
+self.addEventListener('install',()=>self.skipWaiting());
+self.addEventListener('activate',e=>e.waitUntil(self.clients.claim()));
+self.addEventListener('fetch',e=>e.respondWith(
+  caches.open('schufa-v1').then(c=>
+    c.match(e.request).then(r=>r||(fetch(e.request).then(n=>{c.put(e.request,n.clone());return n;})))
+  )
+));`;
+    try{
+      const u=URL.createObjectURL(new Blob([sw],{type:'application/javascript'}));
+      navigator.serviceWorker.register(u,{scope:'./'});
+    }catch(e){}
+  }
+})();
+
+/* ═══════════════════════ INIT ═══════════════════════ */
+render();
+</script>
+</body>
+</html>
