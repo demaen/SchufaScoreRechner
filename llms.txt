@@ -1,0 +1,66 @@
+# Schufa Score Rechner
+
+> Kostenloses Tool zur Schätzung des persönlichen Schufa-Scores anhand von 12 Kriterien (bis zu 999 Punkte).
+> URL: https://demaen.github.io/SchufaScoreRechner/
+
+Dieses Tool basiert auf dem Schufa-Scoring-Modell 2025/2026 und läuft vollständig im Browser.
+Keine Anmeldung erforderlich. Keine Daten werden gespeichert oder übertragen.
+
+## Funktion
+
+Der Nutzer beantwortet 12 Fragen zu seiner finanziellen Situation. Basierend auf den Antworten
+wird ein geschätzter Schufa-Score zwischen 0 und 999 berechnet. Das Ergebnis enthält eine
+Kriterien-Auswertung und personalisierte Verbesserungstipps.
+
+## Kriterien und Gewichtung
+
+| Kriterium | Max. Punkte |
+|---|---|
+| Zahlungsstörungen | 264 |
+| Ältester Bankvertrag | 69 |
+| Älteste Kreditkarte | 81 |
+| Aktuelle Wohnadresse | 94 |
+| Jüngster Rahmenkredit | 36 |
+| Bankanfragen (letzte 12 Monate) | 117 |
+| Anfragen außerhalb Banken (letzte 12 Monate) | 99 |
+| Neue Ratenkredite (letzte 12 Monate) | 66 |
+| Längste Restlaufzeit Ratenkredite | 61 |
+| Kreditstatus | 19 |
+| Immobilienkredit / Bürgschaft | 55 |
+| Identitätsprüfung (eID) | 38 |
+| **Gesamt** | **999** |
+
+## Score-Bewertung
+
+- 900–999: Ausgezeichnet
+- 750–899: Sehr gut
+- 600–749: Gut
+- 400–599: Befriedigend
+- 200–399: Ausreichend
+- 0–199: Unzureichend
+
+## Häufige Fragen
+
+**Was ist ein guter Schufa Score?**
+Ab 800 Punkten gilt der Score als sehr gut. Über 900 Punkte gelten als ausgezeichnet.
+
+**Was senkt den Schufa Score?**
+Offene Zahlungsstörungen, viele Kreditanfragen in kurzer Zeit, häufige Umzüge und mehrere
+neue Ratenkredite innerhalb eines Jahres.
+
+**Wie kann ich meinen Schufa Score verbessern?**
+Offene Forderungen zeitnah begleichen, Kreditanfragen innerhalb von 28 Tagen bündeln,
+alte Bankkonten und Kreditkarten behalten, Identität per eID bei MeineSchufa.de verifizieren
+und möglichst lange an einer Adresse wohnen bleiben.
+
+**Was ist der maximale Schufa Score?**
+999 Punkte.
+
+**Wird eine offene Zahlungsstörung berücksichtigt?**
+Ja. Bei einer aktuell offenen Zahlungsstörung kann die Schufa keinen Score berechnen.
+Nach vollständiger Begleichung oder nach Ablauf von 3 Jahren wird der Eintrag gelöscht.
+
+## Rechtlicher Hinweis
+
+Unverbindliche Orientierung. Basiert nach bestem Wissen auf öffentlich verfügbaren Informationen
+(Stand 17.03.2026). Der verbindliche Score wird ausschließlich von der SCHUFA Holding AG ermittelt.
