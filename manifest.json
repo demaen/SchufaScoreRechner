@@ -1,0 +1,31 @@
+{
+  "name": "Schufa Score Rechner",
+  "short_name": "Score Rechner",
+  "description": "Berechnen Sie Ihren neuen Schufa-Score nach dem aktuellen Modell mit 12 Kriterien",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0d1220",
+  "theme_color": "#0d1220",
+  "orientation": "portrait-primary",
+  "lang": "de",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
