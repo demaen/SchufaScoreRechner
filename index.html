@@ -7,7 +7,36 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Schufa Score">
-<title>Schufa Score Rechner</title>
+<title>Schufa Score Rechner – Kostenlos &amp; Ohne Anmeldung</title>
+<!-- SEO ──────────────────────────────────────────────────────────── -->
+<meta name="description" content="Berechnen Sie Ihren Schufa-Score kostenlos in 2 Minuten – 12 Kriterien, bis zu 999 Punkte. Keine Anmeldung, keine Datenspeicherung. Basiert auf dem aktuellen Schufa-Scoring-Modell (2025/2026).">
+<meta name="keywords" content="Schufa Score berechnen, Schufa Rechner kostenlos, Bonität prüfen, Schufa Punkte, Kreditwürdigkeit, Schufa Score 999">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://demaen.github.io/SchufaScoreRechner/">
+<!-- Open Graph ───────────────────────────────────────────────────── -->
+<meta property="og:title" content="Schufa Score Rechner – Kostenlos &amp; Ohne Anmeldung">
+<meta property="og:description" content="Ermitteln Sie Ihren persönlichen Schufa-Score in 2 Minuten. 12 Kriterien, bis zu 999 Punkte. Keine Daten werden gespeichert.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://demaen.github.io/SchufaScoreRechner/">
+<meta property="og:locale" content="de_DE">
+<meta property="og:site_name" content="Schufa Score Rechner">
+<!-- Structured Data ──────────────────────────────────────────────── -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Schufa Score Rechner",
+  "description": "Kostenloses Tool zur Schätzung des persönlichen Schufa-Scores anhand von 12 Kriterien – bis zu 999 Punkte.",
+  "url": "https://demaen.github.io/SchufaScoreRechner/",
+  "applicationCategory": "FinanceApplication",
+  "operatingSystem": "Any",
+  "inLanguage": "de",
+  "isAccessibleForFree": true,
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+  "author": { "@type": "Person", "name": "demaen" },
+  "dateModified": "2026-03-17"
+}
+</script>
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -302,10 +331,66 @@ body::before{
   color:var(--muted);
   line-height:1.5;
 }
+
+/* ── SEO STATIC SECTION ── */
+.seo-section{
+  max-width:500px;margin:0 auto;
+  padding:28px 18px 16px;
+  border-top:1px solid var(--border);
+  margin-top:8px;
+}
+.seo-section h2{
+  font-family:'Cormorant Garamond',serif;
+  font-size:17px;font-weight:600;
+  color:var(--muted);margin-bottom:8px;margin-top:14px;
+}
+.seo-section h2:first-child{margin-top:0}
+.seo-section p,.seo-section li{
+  font-size:12px;color:var(--muted);
+  line-height:1.65;margin-bottom:5px;
+}
+.seo-section ul{padding-left:18px;margin-bottom:8px}
+.seo-section a{color:var(--gold-d);text-decoration:none}
+.seo-section a:hover{color:var(--gold)}
 </style>
 </head>
 <body>
 <div id="app"></div>
+
+<noscript>
+  <div style="max-width:500px;margin:0 auto;padding:40px 18px;color:#f0ece4;font-family:sans-serif">
+    <h1>Schufa Score Rechner</h1>
+    <p>Dieser kostenlose Rechner schätzt Ihren persönlichen Schufa-Score anhand von 12 Kriterien mit bis zu 999 Punkten. Bitte aktivieren Sie JavaScript, um den Rechner zu nutzen.</p>
+  </div>
+</noscript>
+
+<section class="seo-section" aria-label="Informationen zum Schufa Score">
+  <h2>Was ist der Schufa Score?</h2>
+  <p>
+    Der Schufa-Score ist ein Punktwert zwischen 0 und 999, der die Kreditwürdigkeit einer Person bewertet.
+    Ein höherer Wert steht für eine bessere Bonität und erhöht die Chancen auf Kredite, Mietverträge
+    oder Mobilfunkverträge.
+  </p>
+  <h2>Wie wird der Score berechnet?</h2>
+  <ul>
+    <li>Zahlungsstörungen &amp; negative Einträge</li>
+    <li>Alter der ältesten Bankverbindung und Kreditkarte</li>
+    <li>Wohnstabilität (Dauer an aktueller Adresse)</li>
+    <li>Anzahl der Kredit- und Bonitätsanfragen</li>
+    <li>Aktuelle Ratenkredite und deren Laufzeit</li>
+    <li>Identitätsverifikation per eID</li>
+  </ul>
+  <h2>Wie kann ich meinen Score verbessern?</h2>
+  <p>
+    Zahlen Sie offene Forderungen zeitnah, bündeln Sie Kreditanfragen, halten Sie Ihre ältesten
+    Konten aktiv und verifizieren Sie Ihre Identität bei MeineSchufa.de.
+    Ein stabiler Wohnsitz über mehrere Jahre wirkt sich ebenfalls positiv aus.
+  </p>
+  <p style="font-size:11px;margin-top:12px">
+    <strong>Hinweis:</strong> Unverbindliche Schätzung. Der verbindliche Score wird ausschließlich von der
+    <a href="https://www.schufa.de" rel="noopener noreferrer" target="_blank">SCHUFA Holding AG</a> ermittelt.
+  </p>
+</section>
 <script>
 /* ═══════════════════════ DATA ═══════════════════════ */
 const MAX = 999;

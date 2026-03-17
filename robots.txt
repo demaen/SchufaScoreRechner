@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://demaen.github.io/SchufaScoreRechner/sitemap.xml
